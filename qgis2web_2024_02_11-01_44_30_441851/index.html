@@ -1,0 +1,1500 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/multi-style-layer.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/ManhattanvilleBoundaries_1.js"></script>
+        <script src="data/ManhattanvilleBoundariescopy_2.js"></script>
+        <script src="data/ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3.js"></script>
+        <script src="data/BenchmarkedBuildings_4.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[40.810814681712536,-73.96486305869101],[40.824840932050364,-73.94200845585704]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'feet',
+            secondaryLengthUnit: 'miles',
+            primaryAreaUnit: 'sqfeet',
+            secondaryAreaUnit: 'sqmiles'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OpenStreetMap_0');
+        map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
+        var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OpenStreetMap_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_0;
+        map.addLayer(layer_OpenStreetMap_0);
+        function pop_ManhattanvilleBoundaries_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BoroCode'] !== null ? autolinker.link(feature.properties['BoroCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BoroName'] !== null ? autolinker.link(feature.properties['BoroName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CountyFIPS'] !== null ? autolinker.link(feature.properties['CountyFIPS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTA2020'] !== null ? autolinker.link(feature.properties['NTA2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTAName'] !== null ? autolinker.link(feature.properties['NTAName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTAAbbrev'] !== null ? autolinker.link(feature.properties['NTAAbbrev'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTAType'] !== null ? autolinker.link(feature.properties['NTAType'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CDTA2020'] !== null ? autolinker.link(feature.properties['CDTA2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CDTAName'] !== null ? autolinker.link(feature.properties['CDTAName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(feature.properties['Shape_Leng'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? autolinker.link(feature.properties['Shape_Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_ManhattanvilleBoundaries_1_0() {
+            return {
+                pane: 'pane_ManhattanvilleBoundaries_1',
+                interactive: true,
+            }
+        }
+        function style_ManhattanvilleBoundaries_1_1() {
+            return {
+                pane: 'pane_ManhattanvilleBoundaries_1',
+                opacity: 1,
+                color: 'rgba(45,74,235,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_ManhattanvilleBoundaries_1');
+        map.getPane('pane_ManhattanvilleBoundaries_1').style.zIndex = 401;
+        map.getPane('pane_ManhattanvilleBoundaries_1').style['mix-blend-mode'] = 'normal';
+        var layer_ManhattanvilleBoundaries_1 = new L.geoJson.multiStyle(json_ManhattanvilleBoundaries_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ManhattanvilleBoundaries_1',
+            layerName: 'layer_ManhattanvilleBoundaries_1',
+            pane: 'pane_ManhattanvilleBoundaries_1',
+            onEachFeature: pop_ManhattanvilleBoundaries_1,
+            styles: [style_ManhattanvilleBoundaries_1_0,style_ManhattanvilleBoundaries_1_1,]
+        });
+        bounds_group.addLayer(layer_ManhattanvilleBoundaries_1);
+        map.addLayer(layer_ManhattanvilleBoundaries_1);
+        function pop_ManhattanvilleBoundariescopy_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BoroCode'] !== null ? autolinker.link(feature.properties['BoroCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BoroName'] !== null ? autolinker.link(feature.properties['BoroName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CountyFIPS'] !== null ? autolinker.link(feature.properties['CountyFIPS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTA2020'] !== null ? autolinker.link(feature.properties['NTA2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTAName'] !== null ? autolinker.link(feature.properties['NTAName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTAAbbrev'] !== null ? autolinker.link(feature.properties['NTAAbbrev'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NTAType'] !== null ? autolinker.link(feature.properties['NTAType'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CDTA2020'] !== null ? autolinker.link(feature.properties['CDTA2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CDTAName'] !== null ? autolinker.link(feature.properties['CDTAName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(feature.properties['Shape_Leng'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? autolinker.link(feature.properties['Shape_Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_ManhattanvilleBoundariescopy_2_0() {
+            return {
+                pane: 'pane_ManhattanvilleBoundariescopy_2',
+                opacity: 1,
+                color: 'rgba(45,74,235,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 7.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_ManhattanvilleBoundariescopy_2');
+        map.getPane('pane_ManhattanvilleBoundariescopy_2').style.zIndex = 402;
+        map.getPane('pane_ManhattanvilleBoundariescopy_2').style['mix-blend-mode'] = 'normal';
+        var layer_ManhattanvilleBoundariescopy_2 = new L.geoJson(json_ManhattanvilleBoundariescopy_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ManhattanvilleBoundariescopy_2',
+            layerName: 'layer_ManhattanvilleBoundariescopy_2',
+            pane: 'pane_ManhattanvilleBoundariescopy_2',
+            onEachFeature: pop_ManhattanvilleBoundariescopy_2,
+            style: style_ManhattanvilleBoundariescopy_2_0,
+        });
+        bounds_group.addLayer(layer_ManhattanvilleBoundariescopy_2);
+        map.addLayer(layer_ManhattanvilleBoundariescopy_2);
+        function pop_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Borough'] !== null ? autolinker.link(feature.properties['Borough'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Block'] !== null ? autolinker.link(feature.properties['Block'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot'] !== null ? autolinker.link(feature.properties['Lot'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD'] !== null ? autolinker.link(feature.properties['CD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BCT2020'] !== null ? autolinker.link(feature.properties['BCT2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BCTCB2020'] !== null ? autolinker.link(feature.properties['BCTCB2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CT2010'] !== null ? autolinker.link(feature.properties['CT2010'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CB2010'] !== null ? autolinker.link(feature.properties['CB2010'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SchoolDist'] !== null ? autolinker.link(feature.properties['SchoolDist'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Council'] !== null ? autolinker.link(feature.properties['Council'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Zip Code'] !== null ? autolinker.link(feature.properties['Zip Code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FireComp'] !== null ? autolinker.link(feature.properties['FireComp'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PolicePrct'] !== null ? autolinker.link(feature.properties['PolicePrct'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HealthCent'] !== null ? autolinker.link(feature.properties['HealthCent'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HealthArea'] !== null ? autolinker.link(feature.properties['HealthArea'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Sanitboro'] !== null ? autolinker.link(feature.properties['Sanitboro'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SanitDistr'] !== null ? autolinker.link(feature.properties['SanitDistr'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SanitSub'] !== null ? autolinker.link(feature.properties['SanitSub'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Address'] !== null ? autolinker.link(feature.properties['Address'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Zone District'] !== null ? autolinker.link(feature.properties['Zone District'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneDist2'] !== null ? autolinker.link(feature.properties['ZoneDist2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneDist3'] !== null ? autolinker.link(feature.properties['ZoneDist3'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneDist4'] !== null ? autolinker.link(feature.properties['ZoneDist4'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Overlay1'] !== null ? autolinker.link(feature.properties['Overlay1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Overlay2'] !== null ? autolinker.link(feature.properties['Overlay2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SPDist1'] !== null ? autolinker.link(feature.properties['SPDist1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SPDist2'] !== null ? autolinker.link(feature.properties['SPDist2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SPDist3'] !== null ? autolinker.link(feature.properties['SPDist3'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LtdHeight'] !== null ? autolinker.link(feature.properties['LtdHeight'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SplitZone'] !== null ? autolinker.link(feature.properties['SplitZone'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building Class'] !== null ? autolinker.link(feature.properties['Building Class'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Land Use Category'] !== null ? autolinker.link(feature.properties['Land Use Category'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Easements'] !== null ? autolinker.link(feature.properties['Easements'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OwnerType'] !== null ? autolinker.link(feature.properties['OwnerType'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Owner Name'] !== null ? autolinker.link(feature.properties['Owner Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot Area (ft²)'] !== null ? autolinker.link(feature.properties['Lot Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Building Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Total Building Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Commercial Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Commercial Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Residential Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Residential Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Office Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Office Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Retail Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Retail Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Garage Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Garage Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Storage Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Storage Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Factory Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Factory Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Other Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AreaSource'] !== null ? autolinker.link(feature.properties['AreaSource'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number of Buildings'] !== null ? autolinker.link(feature.properties['Number of Buildings'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number of Floors'] !== null ? autolinker.link(feature.properties['Number of Floors'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number of Residential Units'] !== null ? autolinker.link(feature.properties['Number of Residential Units'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Number of Units'] !== null ? autolinker.link(feature.properties['Total Number of Units'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot Frontage (ft)'] !== null ? autolinker.link(feature.properties['Lot Frontage (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot Depth (ft)'] !== null ? autolinker.link(feature.properties['Lot Depth (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building Frontage (ft)'] !== null ? autolinker.link(feature.properties['Building Frontage (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building Depth (ft)'] !== null ? autolinker.link(feature.properties['Building Depth (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ext'] !== null ? autolinker.link(feature.properties['Ext'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ProxCode'] !== null ? autolinker.link(feature.properties['ProxCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['IrrLotCode'] !== null ? autolinker.link(feature.properties['IrrLotCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LotType'] !== null ? autolinker.link(feature.properties['LotType'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Basement Type/Grade'] !== null ? autolinker.link(feature.properties['Basement Type/Grade'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AssessLand'] !== null ? autolinker.link(feature.properties['AssessLand'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AssessTot'] !== null ? autolinker.link(feature.properties['AssessTot'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ExemptTot'] !== null ? autolinker.link(feature.properties['ExemptTot'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Year Built'] !== null ? autolinker.link(feature.properties['Year Built'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Year Altered'] !== null ? autolinker.link(feature.properties['Year Altered'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Year Altered 2'] !== null ? autolinker.link(feature.properties['Year Altered 2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HistDist'] !== null ? autolinker.link(feature.properties['HistDist'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Landmark'] !== null ? autolinker.link(feature.properties['Landmark'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BuiltFAR'] !== null ? autolinker.link(feature.properties['BuiltFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ResidFAR'] !== null ? autolinker.link(feature.properties['ResidFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CommFAR'] !== null ? autolinker.link(feature.properties['CommFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FacilFAR'] !== null ? autolinker.link(feature.properties['FacilFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BoroCode'] !== null ? autolinker.link(feature.properties['BoroCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BBL ID'] !== null ? autolinker.link(feature.properties['BBL ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CondoNo'] !== null ? autolinker.link(feature.properties['CondoNo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tract2010'] !== null ? autolinker.link(feature.properties['Tract2010'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['XCoord'] !== null ? autolinker.link(feature.properties['XCoord'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['YCoord'] !== null ? autolinker.link(feature.properties['YCoord'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneMap'] !== null ? autolinker.link(feature.properties['ZoneMap'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZMCode'] !== null ? autolinker.link(feature.properties['ZMCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Sanborn'] !== null ? autolinker.link(feature.properties['Sanborn'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TaxMap'] !== null ? autolinker.link(feature.properties['TaxMap'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['EDesigNum'] !== null ? autolinker.link(feature.properties['EDesigNum'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['APPBBL'] !== null ? autolinker.link(feature.properties['APPBBL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['APPDate'] !== null ? autolinker.link(feature.properties['APPDate'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PLUTOMapID'] !== null ? autolinker.link(feature.properties['PLUTOMapID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FIRM07_FLA'] !== null ? autolinker.link(feature.properties['FIRM07_FLA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PFIRM15_FL'] !== null ? autolinker.link(feature.properties['PFIRM15_FL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Version'] !== null ? autolinker.link(feature.properties['Version'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DCPEdited'] !== null ? autolinker.link(feature.properties['DCPEdited'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Latitude'] !== null ? autolinker.link(feature.properties['Latitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Longitude'] !== null ? autolinker.link(feature.properties['Longitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Notes'] !== null ? autolinker.link(feature.properties['Notes'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(feature.properties['Shape_Leng'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? autolinker.link(feature.properties['Shape_Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Report Year'] !== null ? autolinker.link(feature.properties['Report Year'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Property ID'] !== null ? autolinker.link(feature.properties['Property ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Primary Property Type'] !== null ? autolinker.link(feature.properties['Primary Property Type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Largest Property Use TypeProperty (ft²)'] !== null ? autolinker.link(feature.properties['Largest Property Use TypeProperty (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Occupancy (%)'] !== null ? autolinker.link(feature.properties['Occupancy (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ENERGY STAR Score'] !== null ? autolinker.link(feature.properties['ENERGY STAR Score'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Site EUI (kBtu/ft²)'] !== null ? autolinker.link(feature.properties['Weather Normalized Site EUI (kBtu/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Site Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Site Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Site Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Weather Normalized Site Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity - Weather Normalized Site Electricity Use (Grid and Onsite Renewables) (kWh)'] !== null ? autolinker.link(feature.properties['Electricity - Weather Normalized Site Electricity Use (Grid and Onsite Renewables) (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity - Weather Normalized Site Electricity Intensity (Grid and Onsite Renewables) (kWh/ft²)'] !== null ? autolinker.link(feature.properties['Electricity - Weather Normalized Site Electricity Intensity (Grid and Onsite Renewables) (kWh/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas - Weather Normalized Site Natural Gas Use (therms)'] !== null ? autolinker.link(feature.properties['Natural Gas - Weather Normalized Site Natural Gas Use (therms)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas - Weather Normalized Site Natural Gas Intensity (therms/ft²)'] !== null ? autolinker.link(feature.properties['Natural Gas - Weather Normalized Site Natural Gas Intensity (therms/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Source EUI (kBtu/ft²)'] !== null ? autolinker.link(feature.properties['Source EUI (kBtu/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Source EUI (kBtu/ft²)'] !== null ? autolinker.link(feature.properties['Weather Normalized Source EUI (kBtu/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Source Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Source Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Source Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Weather Normalized Source Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Fuel Oil #2 Use (kBtu)'] !== null ? autolinker.link(feature.properties['Fuel Oil #2 Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Fuel Oil #4 Use (kBtu)'] !== null ? autolinker.link(feature.properties['Fuel Oil #4 Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Diesel #2 Use (kBtu)'] !== null ? autolinker.link(feature.properties['Diesel #2 Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Propane Use (kBtu)'] !== null ? autolinker.link(feature.properties['Propane Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas Use (kBtu)'] !== null ? autolinker.link(feature.properties['Natural Gas Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase (kBtu)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase (kWh)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kWh)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kBtu)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Maximum Demand (kW)'] !== null ? autolinker.link(feature.properties['Annual Maximum Demand (kW)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total (Location-Based) GHG Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Total (Location-Based) GHG Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'] !== null ? autolinker.link(feature.properties['Total (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Direct GHG Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Direct GHG Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Direct GHG Emissions Intensity (kgCO2e/ft²)'] !== null ? autolinker.link(feature.properties['Direct GHG Emissions Intensity (kgCO2e/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Indirect (Location-Based) GHG Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Indirect (Location-Based) GHG Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Indirect (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'] !== null ? autolinker.link(feature.properties['Indirect (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Net Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Net Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Indoor Water Use (All Water Sources) (kgal)'] !== null ? autolinker.link(feature.properties['Indoor Water Use (All Water Sources) (kgal)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Annual Consumption (kWh)
+*Weather Normalized @Site Value (Grid and Onsite Renewables)'] !== null ? autolinker.link(feature.properties['Electricity Annual Consumption (kWh)
+*Weather Normalized @Site Value (Grid and Onsite Renewables)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Electricity Cost ($) Electricity per kWh New York State (2022) www.bls.gov/:
+Cost per Unit:
+$0.231/kWh'] !== null ? autolinker.link(feature.properties['Annual Electricity Cost ($) Electricity per kWh New York State (2022) www.bls.gov/:
+Cost per Unit:
+$0.231/kWh'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas Annual Consumption (therms)
+*Weather Normalized @Site Value'] !== null ? autolinker.link(feature.properties['Natural Gas Annual Consumption (therms)
+*Weather Normalized @Site Value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Gas Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$1.845/therm'] !== null ? autolinker.link(feature.properties['Annual Gas Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$1.845/therm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Fuel Oil #2 Consumption (kBtu)'] !== null ? autolinker.link(feature.properties['Annual Fuel Oil #2 Consumption (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Fuel Oil  #2 Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$3.60/gal'] !== null ? autolinker.link(feature.properties['Annual Fuel Oil  #2 Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$3.60/gal'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Annual Energy Cost ($)'] !== null ? autolinker.link(feature.properties['Total Annual Energy Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Annual Energy Cost Intensity ($/ft²/year)'] !== null ? autolinker.link(feature.properties['Total Annual Energy Cost Intensity ($/ft²/year)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Energy Index:
+Weather Normalized  Energy Use Intensity (EUI)  kWh/ft²/year @ SITE value'] !== null ? autolinker.link(feature.properties['Energy Index:
+Weather Normalized  Energy Use Intensity (EUI)  kWh/ft²/year @ SITE value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Energy Index:
+Weather Normalized  Energy Use Intensity (EUI)  BTU/ft²/year  @ SITE value'] !== null ? autolinker.link(feature.properties['Energy Index:
+Weather Normalized  Energy Use Intensity (EUI)  BTU/ft²/year  @ SITE value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Energy Use Intensity (EUI) (BTU/ft²/year) @ SOURCE value'] !== null ? autolinker.link(feature.properties['Weather Normalized Energy Use Intensity (EUI) (BTU/ft²/year) @ SOURCE value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Squandered energy on generation, transmission and inefficiency from source to the moment of use at site.  (%)'] !== null ? autolinker.link(feature.properties['Squandered energy on generation, transmission and inefficiency from source to the moment of use at site.  (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Heating Therms (Considering 70% for heating and 30% for DHW)'] !== null ? autolinker.link(feature.properties['Estimated Heating Therms (Considering 70% for heating and 30% for DHW)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Home Heating Energy (HHE) BTUs  '] !== null ? autolinker.link(feature.properties['Estimated Home Heating Energy (HHE) BTUs  '].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Home Heating Index (HHI) in (BTU/ft²/HDD)
+*Considering a total annual (2022) HDD for NYS - 5942 HDD'] !== null ? autolinker.link(feature.properties['Home Heating Index (HHI) in (BTU/ft²/HDD)
+*Considering a total annual (2022) HDD for NYS - 5942 HDD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Annual Electricity Cost ($)'] !== null ? autolinker.link(feature.properties['Total Annual Electricity Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Approx. Monthly Electricity Bill ($)'] !== null ? autolinker.link(feature.properties['Approx. Monthly Electricity Bill ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Potential for PV Incorporation: Usable Area for Solar (ft2)'] !== null ? autolinker.link(feature.properties['Potential for PV Incorporation: Usable Area for Solar (ft2)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Area that would be used for installation (ft2)'] !== null ? autolinker.link(feature.properties['Area that would be used for installation (ft2)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Max Feasible System Size (kW-DC)'] !== null ? autolinker.link(feature.properties['Estimated Max Feasible System Size (kW-DC)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Sticker Price of Solar System (Before Incentives) ($)'] !== null ? autolinker.link(feature.properties['Sticker Price of Solar System (Before Incentives) ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Out-of-Pocket Cost ($)'] !== null ? autolinker.link(feature.properties['Out-of-Pocket Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Inverter Replacement Cost ($)'] !== null ? autolinker.link(feature.properties['Inverter Replacement Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Operations and Maintenance Costs ($)'] !== null ? autolinker.link(feature.properties['Operations and Maintenance Costs ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NY-Sun Incentive ($)'] !== null ? autolinker.link(feature.properties['NY-Sun Incentive ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Federal Investment Tax Credit ($)'] !== null ? autolinker.link(feature.properties['Federal Investment Tax Credit ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['New York State Tax Credit ($)'] !== null ? autolinker.link(feature.properties['New York State Tax Credit ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Accelerated Depreciation (MACRS) ($)'] !== null ? autolinker.link(feature.properties['Accelerated Depreciation (MACRS) ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NYC Property Tax Abatement ($)'] !== null ? autolinker.link(feature.properties['NYC Property Tax Abatement ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Federal Taxes Due on State Incentives/Credits ($)'] !== null ? autolinker.link(feature.properties['Federal Taxes Due on State Incentives/Credits ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Federal Taxes Due on City Incentives/Credits ($)'] !== null ? autolinker.link(feature.properties['Federal Taxes Due on City Incentives/Credits ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Net Present Value (NPV) of Investment ($)'] !== null ? autolinker.link(feature.properties['Net Present Value (NPV) of Investment ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Internal Rate of Return (IRR) of Investment (%)'] !== null ? autolinker.link(feature.properties['Internal Rate of Return (IRR) of Investment (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Real Levelized Cost of Energy (LCOE) ($/kWh)'] !== null ? autolinker.link(feature.properties['Real Levelized Cost of Energy (LCOE) ($/kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Simple Payback (years)'] !== null ? autolinker.link(feature.properties['Simple Payback (years)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Loan Amount ($)'] !== null ? autolinker.link(feature.properties['Loan Amount ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Down Payment ($)'] !== null ? autolinker.link(feature.properties['Down Payment ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Monthly Payment ($)'] !== null ? autolinker.link(feature.properties['Monthly Payment ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Annual Energy Consumption (kWh)'] !== null ? autolinker.link(feature.properties['Estimated Annual Energy Consumption (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Annual Solar Energy Production (kWh)'] !== null ? autolinker.link(feature.properties['Average Annual Solar Energy Production (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Annual Solar Savings Value ($)'] !== null ? autolinker.link(feature.properties['Average Annual Solar Savings Value ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Monthly Electricity Bill Pre-Solar ($)'] !== null ? autolinker.link(feature.properties['Average Monthly Electricity Bill Pre-Solar ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Monthly Utility Bill Post-Solar ($)'] !== null ? autolinker.link(feature.properties['Average Monthly Utility Bill Post-Solar ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CO2 Emission Reductions per Year (lb CO2/MWh)'] !== null ? autolinker.link(feature.properties['CO2 Emission Reductions per Year (lb CO2/MWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Trees Planted Equivalent (units/year)'] !== null ? autolinker.link(feature.properties['Trees Planted Equivalent (units/year)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3_0() {
+            return {
+                pane: 'pane_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3',
+                opacity: 1,
+                color: 'rgba(247,247,247,0.9)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(82,82,82,0.9)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3');
+        map.getPane('pane_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3').style.zIndex = 403;
+        map.getPane('pane_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3').style['mix-blend-mode'] = 'normal';
+        var layer_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3 = new L.geoJson(json_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3',
+            layerName: 'layer_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3',
+            pane: 'pane_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3',
+            onEachFeature: pop_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3,
+            style: style_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3_0,
+        });
+        bounds_group.addLayer(layer_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3);
+        map.addLayer(layer_ORGNLNOBORRARRefactoredBasecopycopycopycopycopycopycopycopycopy_3);
+        function pop_BenchmarkedBuildings_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Borough'] !== null ? autolinker.link(feature.properties['Borough'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Block'] !== null ? autolinker.link(feature.properties['Block'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot'] !== null ? autolinker.link(feature.properties['Lot'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD'] !== null ? autolinker.link(feature.properties['CD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BCT2020'] !== null ? autolinker.link(feature.properties['BCT2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BCTCB2020'] !== null ? autolinker.link(feature.properties['BCTCB2020'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CT2010'] !== null ? autolinker.link(feature.properties['CT2010'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CB2010'] !== null ? autolinker.link(feature.properties['CB2010'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SchoolDist'] !== null ? autolinker.link(feature.properties['SchoolDist'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Council'] !== null ? autolinker.link(feature.properties['Council'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Zip Code'] !== null ? autolinker.link(feature.properties['Zip Code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FireComp'] !== null ? autolinker.link(feature.properties['FireComp'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PolicePrct'] !== null ? autolinker.link(feature.properties['PolicePrct'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HealthCent'] !== null ? autolinker.link(feature.properties['HealthCent'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HealthArea'] !== null ? autolinker.link(feature.properties['HealthArea'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Sanitboro'] !== null ? autolinker.link(feature.properties['Sanitboro'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SanitDistr'] !== null ? autolinker.link(feature.properties['SanitDistr'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SanitSub'] !== null ? autolinker.link(feature.properties['SanitSub'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Address'] !== null ? autolinker.link(feature.properties['Address'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Zone District'] !== null ? autolinker.link(feature.properties['Zone District'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneDist2'] !== null ? autolinker.link(feature.properties['ZoneDist2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneDist3'] !== null ? autolinker.link(feature.properties['ZoneDist3'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneDist4'] !== null ? autolinker.link(feature.properties['ZoneDist4'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Overlay1'] !== null ? autolinker.link(feature.properties['Overlay1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Overlay2'] !== null ? autolinker.link(feature.properties['Overlay2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SPDist1'] !== null ? autolinker.link(feature.properties['SPDist1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SPDist2'] !== null ? autolinker.link(feature.properties['SPDist2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SPDist3'] !== null ? autolinker.link(feature.properties['SPDist3'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LtdHeight'] !== null ? autolinker.link(feature.properties['LtdHeight'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SplitZone'] !== null ? autolinker.link(feature.properties['SplitZone'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building Class'] !== null ? autolinker.link(feature.properties['Building Class'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Land Use Category'] !== null ? autolinker.link(feature.properties['Land Use Category'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Easements'] !== null ? autolinker.link(feature.properties['Easements'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OwnerType'] !== null ? autolinker.link(feature.properties['OwnerType'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Owner Name'] !== null ? autolinker.link(feature.properties['Owner Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot Area (ft²)'] !== null ? autolinker.link(feature.properties['Lot Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Building Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Total Building Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Commercial Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Commercial Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Residential Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Residential Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Office Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Office Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Retail Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Retail Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Garage Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Garage Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Storage Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Storage Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Factory Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Factory Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Floor Area (ft²)'] !== null ? autolinker.link(feature.properties['Other Floor Area (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AreaSource'] !== null ? autolinker.link(feature.properties['AreaSource'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number of Buildings'] !== null ? autolinker.link(feature.properties['Number of Buildings'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number of Floors'] !== null ? autolinker.link(feature.properties['Number of Floors'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number of Residential Units'] !== null ? autolinker.link(feature.properties['Number of Residential Units'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Number of Units'] !== null ? autolinker.link(feature.properties['Total Number of Units'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot Frontage (ft)'] !== null ? autolinker.link(feature.properties['Lot Frontage (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lot Depth (ft)'] !== null ? autolinker.link(feature.properties['Lot Depth (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building Frontage (ft)'] !== null ? autolinker.link(feature.properties['Building Frontage (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building Depth (ft)'] !== null ? autolinker.link(feature.properties['Building Depth (ft)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ext'] !== null ? autolinker.link(feature.properties['Ext'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ProxCode'] !== null ? autolinker.link(feature.properties['ProxCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['IrrLotCode'] !== null ? autolinker.link(feature.properties['IrrLotCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LotType'] !== null ? autolinker.link(feature.properties['LotType'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Basement Type/Grade'] !== null ? autolinker.link(feature.properties['Basement Type/Grade'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AssessLand'] !== null ? autolinker.link(feature.properties['AssessLand'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AssessTot'] !== null ? autolinker.link(feature.properties['AssessTot'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ExemptTot'] !== null ? autolinker.link(feature.properties['ExemptTot'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Year Built'] !== null ? autolinker.link(feature.properties['Year Built'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Year Altered'] !== null ? autolinker.link(feature.properties['Year Altered'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Year Altered 2'] !== null ? autolinker.link(feature.properties['Year Altered 2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HistDist'] !== null ? autolinker.link(feature.properties['HistDist'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Landmark'] !== null ? autolinker.link(feature.properties['Landmark'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BuiltFAR'] !== null ? autolinker.link(feature.properties['BuiltFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ResidFAR'] !== null ? autolinker.link(feature.properties['ResidFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CommFAR'] !== null ? autolinker.link(feature.properties['CommFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FacilFAR'] !== null ? autolinker.link(feature.properties['FacilFAR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BoroCode'] !== null ? autolinker.link(feature.properties['BoroCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BBL ID'] !== null ? autolinker.link(feature.properties['BBL ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CondoNo'] !== null ? autolinker.link(feature.properties['CondoNo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tract2010'] !== null ? autolinker.link(feature.properties['Tract2010'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['XCoord'] !== null ? autolinker.link(feature.properties['XCoord'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['YCoord'] !== null ? autolinker.link(feature.properties['YCoord'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZoneMap'] !== null ? autolinker.link(feature.properties['ZoneMap'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZMCode'] !== null ? autolinker.link(feature.properties['ZMCode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Sanborn'] !== null ? autolinker.link(feature.properties['Sanborn'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TaxMap'] !== null ? autolinker.link(feature.properties['TaxMap'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['EDesigNum'] !== null ? autolinker.link(feature.properties['EDesigNum'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['APPBBL'] !== null ? autolinker.link(feature.properties['APPBBL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['APPDate'] !== null ? autolinker.link(feature.properties['APPDate'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PLUTOMapID'] !== null ? autolinker.link(feature.properties['PLUTOMapID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FIRM07_FLA'] !== null ? autolinker.link(feature.properties['FIRM07_FLA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PFIRM15_FL'] !== null ? autolinker.link(feature.properties['PFIRM15_FL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Version'] !== null ? autolinker.link(feature.properties['Version'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DCPEdited'] !== null ? autolinker.link(feature.properties['DCPEdited'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Latitude'] !== null ? autolinker.link(feature.properties['Latitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Longitude'] !== null ? autolinker.link(feature.properties['Longitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Notes'] !== null ? autolinker.link(feature.properties['Notes'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(feature.properties['Shape_Leng'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? autolinker.link(feature.properties['Shape_Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Report Year'] !== null ? autolinker.link(feature.properties['Report Year'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Property ID'] !== null ? autolinker.link(feature.properties['Property ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Primary Property Type'] !== null ? autolinker.link(feature.properties['Primary Property Type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Largest Property Use TypeProperty (ft²)'] !== null ? autolinker.link(feature.properties['Largest Property Use TypeProperty (ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Occupancy (%)'] !== null ? autolinker.link(feature.properties['Occupancy (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ENERGY STAR Score'] !== null ? autolinker.link(feature.properties['ENERGY STAR Score'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Site EUI (kBtu/ft²)'] !== null ? autolinker.link(feature.properties['Weather Normalized Site EUI (kBtu/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Site Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Site Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Site Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Weather Normalized Site Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity - Weather Normalized Site Electricity Use (Grid and Onsite Renewables) (kWh)'] !== null ? autolinker.link(feature.properties['Electricity - Weather Normalized Site Electricity Use (Grid and Onsite Renewables) (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity - Weather Normalized Site Electricity Intensity (Grid and Onsite Renewables) (kWh/ft²)'] !== null ? autolinker.link(feature.properties['Electricity - Weather Normalized Site Electricity Intensity (Grid and Onsite Renewables) (kWh/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas - Weather Normalized Site Natural Gas Use (therms)'] !== null ? autolinker.link(feature.properties['Natural Gas - Weather Normalized Site Natural Gas Use (therms)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas - Weather Normalized Site Natural Gas Intensity (therms/ft²)'] !== null ? autolinker.link(feature.properties['Natural Gas - Weather Normalized Site Natural Gas Intensity (therms/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Source EUI (kBtu/ft²)'] !== null ? autolinker.link(feature.properties['Source EUI (kBtu/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Source EUI (kBtu/ft²)'] !== null ? autolinker.link(feature.properties['Weather Normalized Source EUI (kBtu/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Source Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Source Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Source Energy Use (kBtu)'] !== null ? autolinker.link(feature.properties['Weather Normalized Source Energy Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Fuel Oil #2 Use (kBtu)'] !== null ? autolinker.link(feature.properties['Fuel Oil #2 Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Fuel Oil #4 Use (kBtu)'] !== null ? autolinker.link(feature.properties['Fuel Oil #4 Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Diesel #2 Use (kBtu)'] !== null ? autolinker.link(feature.properties['Diesel #2 Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Propane Use (kBtu)'] !== null ? autolinker.link(feature.properties['Propane Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas Use (kBtu)'] !== null ? autolinker.link(feature.properties['Natural Gas Use (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase (kBtu)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase (kWh)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kWh)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kBtu)'] !== null ? autolinker.link(feature.properties['Electricity Use - Grid Purchase and Generated from Onsite Renewable Systems (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Maximum Demand (kW)'] !== null ? autolinker.link(feature.properties['Annual Maximum Demand (kW)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total (Location-Based) GHG Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Total (Location-Based) GHG Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'] !== null ? autolinker.link(feature.properties['Total (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Direct GHG Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Direct GHG Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Direct GHG Emissions Intensity (kgCO2e/ft²)'] !== null ? autolinker.link(feature.properties['Direct GHG Emissions Intensity (kgCO2e/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Indirect (Location-Based) GHG Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Indirect (Location-Based) GHG Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Indirect (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'] !== null ? autolinker.link(feature.properties['Indirect (Location-Based) GHG Emissions Intensity (kgCO2e/ft²)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Net Emissions (Metric Tons CO2e)'] !== null ? autolinker.link(feature.properties['Net Emissions (Metric Tons CO2e)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Indoor Water Use (All Water Sources) (kgal)'] !== null ? autolinker.link(feature.properties['Indoor Water Use (All Water Sources) (kgal)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Electricity Annual Consumption (kWh)
+*Weather Normalized @Site Value (Grid and Onsite Renewables)'] !== null ? autolinker.link(feature.properties['Electricity Annual Consumption (kWh)
+*Weather Normalized @Site Value (Grid and Onsite Renewables)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Electricity Cost ($) Electricity per kWh New York State (2022) www.bls.gov/:
+Cost per Unit:
+$0.231/kWh'] !== null ? autolinker.link(feature.properties['Annual Electricity Cost ($) Electricity per kWh New York State (2022) www.bls.gov/:
+Cost per Unit:
+$0.231/kWh'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Natural Gas Annual Consumption (therms)
+*Weather Normalized @Site Value'] !== null ? autolinker.link(feature.properties['Natural Gas Annual Consumption (therms)
+*Weather Normalized @Site Value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Gas Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$1.845/therm'] !== null ? autolinker.link(feature.properties['Annual Gas Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$1.845/therm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Fuel Oil #2 Consumption (kBtu)'] !== null ? autolinker.link(feature.properties['Annual Fuel Oil #2 Consumption (kBtu)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Annual Fuel Oil  #2 Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$3.60/gal'] !== null ? autolinker.link(feature.properties['Annual Fuel Oil  #2 Cost ($) Utility (piped) gas per therm New York State (2022) www.bls.gov/:
+Cost per Unit:
+$3.60/gal'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Annual Energy Cost ($)'] !== null ? autolinker.link(feature.properties['Total Annual Energy Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Annual Energy Cost Intensity ($/ft²/year)'] !== null ? autolinker.link(feature.properties['Total Annual Energy Cost Intensity ($/ft²/year)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['EUI  kWh/ft²/year at SITE value'] !== null ? autolinker.link(feature.properties['EUI  kWh/ft²/year at SITE value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['EUI  BTU/ft²/year at SITE value'] !== null ? autolinker.link(feature.properties['EUI  BTU/ft²/year at SITE value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Weather Normalized Energy Use Intensity (EUI) (BTU/ft²/year) @ SOURCE value'] !== null ? autolinker.link(feature.properties['Weather Normalized Energy Use Intensity (EUI) (BTU/ft²/year) @ SOURCE value'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Squandered energy on generation, transmission and inefficiency from source to the moment of use at site.  (%)'] !== null ? autolinker.link(feature.properties['Squandered energy on generation, transmission and inefficiency from source to the moment of use at site.  (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Heating Therms (Considering 70% for heating and 30% for DHW)'] !== null ? autolinker.link(feature.properties['Estimated Heating Therms (Considering 70% for heating and 30% for DHW)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Home Heating Energy (HHE) BTUs  '] !== null ? autolinker.link(feature.properties['Estimated Home Heating Energy (HHE) BTUs  '].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Home Heating Index (HHI) in (BTU/ft²/HDD)
+*Considering a total annual (2022) HDD for NYS - 5942 HDD'] !== null ? autolinker.link(feature.properties['Home Heating Index (HHI) in (BTU/ft²/HDD)
+*Considering a total annual (2022) HDD for NYS - 5942 HDD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Total Annual Electricity Cost ($)'] !== null ? autolinker.link(feature.properties['Total Annual Electricity Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Approx. Monthly Electricity Bill ($)'] !== null ? autolinker.link(feature.properties['Approx. Monthly Electricity Bill ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Potential for PV Incorporation: Usable Area for Solar (ft2)'] !== null ? autolinker.link(feature.properties['Potential for PV Incorporation: Usable Area for Solar (ft2)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Area that would be used for installation (ft2)'] !== null ? autolinker.link(feature.properties['Area that would be used for installation (ft2)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Max Feasible System Size (kW-DC)'] !== null ? autolinker.link(feature.properties['Estimated Max Feasible System Size (kW-DC)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Sticker Price of Solar System (Before Incentives) ($)'] !== null ? autolinker.link(feature.properties['Sticker Price of Solar System (Before Incentives) ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Out-of-Pocket Cost ($)'] !== null ? autolinker.link(feature.properties['Out-of-Pocket Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Inverter Replacement Cost ($)'] !== null ? autolinker.link(feature.properties['Inverter Replacement Cost ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Operations and Maintenance Costs ($)'] !== null ? autolinker.link(feature.properties['Operations and Maintenance Costs ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NY-Sun Incentive ($)'] !== null ? autolinker.link(feature.properties['NY-Sun Incentive ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Federal Investment Tax Credit ($)'] !== null ? autolinker.link(feature.properties['Federal Investment Tax Credit ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['New York State Tax Credit ($)'] !== null ? autolinker.link(feature.properties['New York State Tax Credit ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Accelerated Depreciation (MACRS) ($)'] !== null ? autolinker.link(feature.properties['Accelerated Depreciation (MACRS) ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NYC Property Tax Abatement ($)'] !== null ? autolinker.link(feature.properties['NYC Property Tax Abatement ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Federal Taxes Due on State Incentives/Credits ($)'] !== null ? autolinker.link(feature.properties['Federal Taxes Due on State Incentives/Credits ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Federal Taxes Due on City Incentives/Credits ($)'] !== null ? autolinker.link(feature.properties['Federal Taxes Due on City Incentives/Credits ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Net Present Value (NPV) of Investment ($)'] !== null ? autolinker.link(feature.properties['Net Present Value (NPV) of Investment ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Internal Rate of Return (IRR) of Investment (%)'] !== null ? autolinker.link(feature.properties['Internal Rate of Return (IRR) of Investment (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Real Levelized Cost of Energy (LCOE) ($/kWh)'] !== null ? autolinker.link(feature.properties['Real Levelized Cost of Energy (LCOE) ($/kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Simple Payback (years)'] !== null ? autolinker.link(feature.properties['Simple Payback (years)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Loan Amount ($)'] !== null ? autolinker.link(feature.properties['Loan Amount ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Down Payment ($)'] !== null ? autolinker.link(feature.properties['Down Payment ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Monthly Payment ($)'] !== null ? autolinker.link(feature.properties['Monthly Payment ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estimated Annual Energy Consumption (kWh)'] !== null ? autolinker.link(feature.properties['Estimated Annual Energy Consumption (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Annual Solar Energy Production (kWh)'] !== null ? autolinker.link(feature.properties['Average Annual Solar Energy Production (kWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Annual Solar Savings Value ($)'] !== null ? autolinker.link(feature.properties['Average Annual Solar Savings Value ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Monthly Electricity Bill Pre-Solar ($)'] !== null ? autolinker.link(feature.properties['Average Monthly Electricity Bill Pre-Solar ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Average Monthly Utility Bill Post-Solar ($)'] !== null ? autolinker.link(feature.properties['Average Monthly Utility Bill Post-Solar ($)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CO2 Emission Reductions per Year (lb CO2/MWh)'] !== null ? autolinker.link(feature.properties['CO2 Emission Reductions per Year (lb CO2/MWh)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Trees Planted Equivalent (units/year)'] !== null ? autolinker.link(feature.properties['Trees Planted Equivalent (units/year)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_BenchmarkedBuildings_4_0() {
+            return {
+                pane: 'pane_BenchmarkedBuildings_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(44,44,210,1.0)',
+                interactive: true,
+            }
+        }
+        function style_BenchmarkedBuildings_4_1() {
+            return {
+                pane: 'pane_BenchmarkedBuildings_4',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_BenchmarkedBuildings_4');
+        map.getPane('pane_BenchmarkedBuildings_4').style.zIndex = 404;
+        map.getPane('pane_BenchmarkedBuildings_4').style['mix-blend-mode'] = 'normal';
+        var layer_BenchmarkedBuildings_4 = new L.geoJson.multiStyle(json_BenchmarkedBuildings_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_BenchmarkedBuildings_4',
+            layerName: 'layer_BenchmarkedBuildings_4',
+            pane: 'pane_BenchmarkedBuildings_4',
+            onEachFeature: pop_BenchmarkedBuildings_4,
+            styles: [style_BenchmarkedBuildings_4_0,style_BenchmarkedBuildings_4_1,]
+        });
+        bounds_group.addLayer(layer_BenchmarkedBuildings_4);
+        map.addLayer(layer_BenchmarkedBuildings_4);
+        setBounds();
+        </script>
+    </body>
+</html>
